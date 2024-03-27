@@ -205,7 +205,7 @@ def doPlotLc(strategies, t, delay_hr, xlim=[0, 7], ylim=[28, 18],
                             color=filters_color_dict[filt.replace("lsst", "")])
 
         # Set plot parameters
-        plt.rcParams['xtick.labelsize'] = 11
+        plt.rcParams['xtick.labelsize'] = 20
         ax.legend(fontsize=11, loc='center left', bbox_to_anchor=(1, 0.5))
         ax.set_xlim(xlim)
         ax.set_ylim(ylim)
@@ -217,9 +217,12 @@ def doPlotLc(strategies, t, delay_hr, xlim=[0, 7], ylim=[28, 18],
 
         # Save to file
         if doSave is True:
-            out_filename = f"{outfile_base}_{strategy_names[i]}.\
-{outfile_format}"
-            plt.savefig(out_filename.replace(" ", "_"), bbox_inches='tight')
-        if doShow is True:
-            plt.show()
-        plt.close()
+        # Generate a valid filename by replacing invalid characters such as spaces with underscores
+            out_filename = f"{outfile_base}_{strategy_names[i]}.{outfile_format}"
+            out_filename = out_filename.replace(" ", "_")  # Replace spaces with underscores
+            out_filename = out_filename.replace("<", "lt")  # Replace < with 'lt' or any other valid character
+            out_filename = out_filename.replace(">", "gt")  # Replace > with 'gt' or any other valid character
+    # Add any additional filename sanitization steps if necessary
+            plt.savefig(out_filename, bbox_inches='tight')
+            if doShow is True:
+                plt.show()
