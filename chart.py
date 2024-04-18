@@ -175,7 +175,34 @@ def makeChart(results, event="BNS merger",
     ax.legend(by_label.values(), by_label.keys(), loc='upper center',
               bbox_to_anchor=bbox_to_anchor, ncol=8, fancybox=True, shadow=False,
               fontsize=20, framealpha=0.8, borderpad=1.5)
+<<<<<<< Updated upstream
  
+=======
+    
+    # # Logscale
+    # ax.set_xscale("log")
+
+    # # Fix the y axis limits
+    # ax.tick_params(labelsize=30, width=1, length=5)
+    # ax.set_ylim(ymin=0, ymax=ilen*0.5+0.2)
+    # ax.invert_yaxis()
+    # # Fix the x axis limits
+    # xlim = ax.get_xlim()  # get existing x limits
+    # ax.set_xlim(xlim)
+
+    # # Secondary axis (days)
+    # ax2 = ax.twiny()  # instantiate a second axes that shares the same y-axis
+    # xlim2 = [np.log10(xlim[0]), np.log10(xlim[1])]
+    # ax2.set_xlim(xlim2)
+    # x2ticks = [0.2, 1, 2]
+    # ax2.set_xticks([np.log10(24*x) for x in x2ticks])
+    # ax2.set_xticklabels(x2ticks)
+    # ax2.tick_params(labelsize=30, width=1, length=5)
+    # ax2.set_xlabel(f"Days from {event}", fontsize=30)
+
+   # Logscale
+    # ax.set_xscale("log")
+>>>>>>> Stashed changes
 
     # Fix the y axis limits
     ax.tick_params(labelsize=30, width=1, length=5)
@@ -191,6 +218,10 @@ def makeChart(results, event="BNS merger",
 
     # Secondary axis (days)
     ax2 = ax.twiny()  # instantiate a second axes that shares the same y-axis
+<<<<<<< Updated upstream
+=======
+    # ax2.set_xscale("log")  # Set log scale for secondary x-axis
+>>>>>>> Stashed changes
     ax2.set_xlabel(f"Days from {event}", fontsize=30)
     
     # Set secondary axis limits directly in days
@@ -207,7 +238,6 @@ def makeChart(results, event="BNS merger",
     plt.subplots_adjust(left=0.2)
 
     return fig, ax
-
 
 def plot_edges(results, ax, marker_size=50,
                exptimes_marker_list=["o", "s", "p", "h", "8"],
