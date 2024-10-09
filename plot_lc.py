@@ -131,13 +131,13 @@ def doPlotLc(strategies, t, delay_hr, xlim=[0, 7], ylim=[28, 18],
         t.add_row([0.] + [99. for x in np.arange(len(t.colnames) - 1)])
         # Re-sort
         t.sort("t[days]")
+
     # For each strategy make a plot
     strategy_names = list(strategies.keys())
     for i in range(len(strategy_names)):
         print(f"\n Strategy name: {strategy_names[i]}")
         # Epochs of the strategy in days
-        days_strategy = np.array(strategies[strategy_names[i]]["cadence_hr"]
-                                 ) / 24
+        days_strategy = np.array(strategies[strategy_names[i]]["cadence_hr"]) / 24
         depths_strategy = strategies[strategy_names[i]]["depths"]
         filters_strategy = strategies[strategy_names[i]]["filters"]
         # Initialize detections and non-detections
@@ -153,6 +153,7 @@ def doPlotLc(strategies, t, delay_hr, xlim=[0, 7], ylim=[28, 18],
                 marker="o", linestyle="none", markersize=8)
         ax.plot([], [], label="UL", color="k",
                 marker="v", linestyle="none", markersize=8)
+
         for filt in t.colnames:
             # Ignore anything not LSST
             if filt[0] != "l":
@@ -163,25 +164,20 @@ def doPlotLc(strategies, t, delay_hr, xlim=[0, 7], ylim=[28, 18],
             # Add the offset by filter
             offset_filt_hr_tot += offset_filt_hr
             # Interpolate to reduce noise
-            idx = [i for i in np.arange(len(t)) if
-                   np.isnan(t[filt][i]) == False]
+            idx = [i for i in np.arange(len(t)) if np.isnan(t[filt][i]) == False]
             idx = [i for i in idx if not t[filt][i] == np.inf]
-            xnew = np.linspace(t["t[days]"][idx].min(),
-                               t["t[days]"][idx].max(), n_interp)
+            xnew = np.linspace(t["t[days]"][idx].min(), t["t[days]"][idx].max(), n_interp)
             f = interpolate.interp1d(t["t[days]"][idx], t[filt][idx])
-            if filt[0] == "l":
-                label = f"{filt.replace('lsst', '')}"
-            else:
-                label = f"Roman {filt.replace('f', 'F')}"
+            label = f"{filt.replace('lsst', '')}"
             # Plot the model
             ax.plot(xnew, f(xnew), linestyle=linestyle, label=label,
                     color=filters_color_dict[filt.replace("lsst", "")])
             # for each epoch, check if there is the given filter
             for day_strategy, filter_strategy, depth_strategy_epoch in zip(days_strategy, filters_strategy, depths_strategy):
                 # Apply the delay between the event and the obs. window
-                day_strategy += delay_hr/24  # from hours to days
+                day_strategy += delay_hr / 24  # from hours to days
                 # Apply a delay between filters to show overlapping points
-                day_strategy += offset_filt_hr_tot/24
+                day_strategy += offset_filt_hr_tot / 24
                 if not (filt.replace('lsst', '') in filter_strategy):
                     continue
                 else:
@@ -190,19 +186,22 @@ def doPlotLc(strategies, t, delay_hr, xlim=[0, 7], ylim=[28, 18],
                     depth = depth_strategy_epoch[idx]
                 # Detection or non-detection?
                 if f(day_strategy) <= depth:
-                    detections.append((filt.replace('lsst', ''),
-                                       day_strategy, f(day_strategy)))
+                    detections.append((filt.replace('lsst', ''), day_strategy, f(day_strategy)))
                     # Plot the detection
                     ax.plot(day_strategy, f(day_strategy), linestyle="none",
                             marker="o", markersize=8,
                             color=filters_color_dict[filt.replace("lsst", "")])
                 else:
-                    non_detections.append((filt.replace('lsst', ''),
-                                           day_strategy, depth))
+                    non_detections.append((filt.replace('lsst', ''), day_strategy, depth))
                     # Plot the non-detection
                     ax.plot(day_strategy, depth, linestyle="none",
                             marker="v", markersize=8,
                             color=filters_color_dict[filt.replace("lsst", "")])
+
+        # Add horizontal dashed lines for fiveSigmaDepth magnitudes for the lsstr, lssti, and lsstg bands
+        ax.axhline(y=24.5, color='r', linestyle='dotted', linewidth=2)  # lsstr
+        ax.axhline(y=23, color='yellow', linestyle='dotted', linewidth=2)  # lssti
+        ax.axhline(y=25, color='g', linestyle='dotted', linewidth=2)  # lsstg
 
         # Set plot parameters
         plt.rcParams['xtick.labelsize'] = 20
@@ -217,12 +216,14 @@ def doPlotLc(strategies, t, delay_hr, xlim=[0, 7], ylim=[28, 18],
 
         # Save to file
         if doSave is True:
-        # Generate a valid filename by replacing invalid characters such as spaces with underscores
+            # Generate a valid filename by replacing invalid characters such as spaces with underscores
             out_filename = f"{outfile_base}_{strategy_names[i]}.{outfile_format}"
             out_filename = out_filename.replace(" ", "_")  # Replace spaces with underscores
             out_filename = out_filename.replace("<", "lt")  # Replace < with 'lt' or any other valid character
             out_filename = out_filename.replace(">", "gt")  # Replace > with 'gt' or any other valid character
-    # Add any additional filename sanitization steps if necessary
+            # Add any additional filename sanitization steps if necessary
             plt.savefig(out_filename, bbox_inches='tight')
-            if doShow is True:
-                plt.show()
+
+        if doShow is True:
+            plt.show()
+
